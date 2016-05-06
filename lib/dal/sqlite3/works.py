@@ -15,6 +15,7 @@ class Works(Sqlite3Base):
             "(" + ", ".join(field_list) + ") "
             "VALUES (:" + ", :".join(field_list) + ")" 
         )
+        
         # field_dict now becomes our named parameter dict
         for field in field_list:
             field_dict[":"+field] = field_dict.pop(field)
