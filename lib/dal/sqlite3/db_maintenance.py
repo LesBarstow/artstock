@@ -2,7 +2,7 @@ import os;
 import os.path;
 import sqlite3;
 
-class InitDb():
+class DbMaintenance():
     
     def __init__(self, config):
         if ( config['force'] ):
@@ -22,10 +22,12 @@ class InitDb():
         self._table_prefix = ''
         if ( 'prefix' in config ):
             self._table_prefix = config['prefix'] + '_'
+
+    def drop_tables(self):
+        self.drop_works()
     
     def create_tables(self):
         self.create_works()
-        self.db_finish()
     
     def create_works(self):
         cw_cur = self._db_conn.cursor()
@@ -40,6 +42,10 @@ class InitDb():
             )
             """)
         self._db_conn.commit()
+    
+    def drop_works(self):
+        cw_cur = self._db_conn.cursor()
+        cw_cur.execute("DROP TABLE " + self._table_prefix + "works")
     
     def db_finish(self):
         self._db_conn.close()
