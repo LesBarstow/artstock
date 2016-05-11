@@ -36,6 +36,7 @@ class TestWorks(object):
             'title': 'Testable Art',
             'description': 'Sample art for testing.'
         }
+        # Assert null return - failure is indicated by exception
         assert self.works.create(create_args) is None
 
     def TestWorkingRetrieve(self):
@@ -48,6 +49,7 @@ class TestWorks(object):
         }
         self.works.create(create_args)
         
+        # Now retrieve our test row - test case is by work_id only
         retrieve_args = {
             'work_id': 'AWTEST-001-02'
         }
