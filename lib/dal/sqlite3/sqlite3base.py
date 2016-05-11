@@ -21,9 +21,9 @@ class Sqlite3Base():
         if ( 'prefix' in config ):
             self._table_prefix = config['prefix'] + '_'
             
-    def test_values(self, requirements, values):
+    def test_fields(self, requirements, values):
         field_dict = dict()
-        for field, requirement in requirements:
+        for field, requirement in requirements.items():
             if ( requirement == 'req'):
                 if ( field not in values ):
                     raise FieldRequiredError
@@ -48,3 +48,5 @@ class Sqlite3Base():
             # that can actually be useful in some cases - insert from returned field_dict
         return field_dict
     
+    def db_finish(self):
+        self._db_conn.close()

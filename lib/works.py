@@ -9,7 +9,7 @@ class Works():
         dbtype = 'sqlite3'
         if ( 'dbtype' in config):
             dbtype = config['dbtype']
-        self.dbaccess = importlib.import_module(dbtype + '.works')
+        self.dbaccess = importlib.import_module('dal.' + dbtype + '.works')
         self.works_dbh = self.dbaccess.Works(config)
     
     def create(self, values):

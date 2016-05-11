@@ -5,7 +5,7 @@ import sqlite3;
 class DbMaintenance():
     
     def __init__(self, config):
-        if ( config['force'] ):
+        if ( 'force' in config and config['force'] ):
             if ( os.path.exists(config['dbpath']) ):
                 if ( os.path.isfile(config['dbpath']) ):
                     try:

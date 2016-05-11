@@ -1,8 +1,11 @@
 from dal.sqlite3.sqlite3base import Sqlite3Base
+
+import json # for debugging
+
 class Works(Sqlite3Base):
     def create(self, values):
         requirements = {
-            'works_id': 'reqnotnull',
+            'work_id': 'reqnotnull',
             'title': 'notreq',
             'description': 'notreq',
             'work_created_ts': 'notreq'
@@ -15,11 +18,6 @@ class Works(Sqlite3Base):
             "(" + ", ".join(field_list) + ") "
             "VALUES (:" + ", :".join(field_list) + ")" 
         )
-        
-        # field_dict now becomes our named parameter dict
-        for field in field_list:
-            field_dict[":"+field] = field_dict.pop(field)
-        
         create_cur = self._db_conn.cursor()
         create_cur.execute(create_sql, field_dict)
         self._db_conn.commit()
@@ -43,7 +41,7 @@ class Works(Sqlite3Base):
     
     def retrieve(self, values):
         requirements = {
-            'works_id': 'notreqnotnull',
+            'work_id': 'notreqnotnull',
             'title': 'notreq',
             'description': 'notreq',
             'work_created_ts': 'notreq',
@@ -65,46 +63,41 @@ class Works(Sqlite3Base):
             if ( match_type != "contains" ):
                 match_type = "exact"
         clauses = list()
-        if ( "works_id" in field_dict):
+        if ( "work_id" in field_dict):
             if ( match_type == "exact" ):
-                clauses.push("works_id = :works_id")
-                field_dict[":works_id"] = field_dict.pop("works_id")
+                clauses.append("work_id = :work_id")
             elif ( match_type == "contains" ):
-                clauses.push("works_id LIKE :works_id")
-                field_dict[":works_id"] = "%" + field_dict.pop("works_id") + "%"
+                clauses.append("work_id LIKE :work_id")
+                field_dict["work_id"] = "%" + field_dict["work_id"] + "%"
         if ( "title" in field_dict ):
             if ( match_type == "exact" ):
-                clauses.push("title = :title")
-                field_dict[":title"] = field_dict.pop("title")
+                clauses.append("title = :title")
             elif ( match_type == "contains" ):
-                clauses.push("title LIKE :title")
-                field_dict[":title"] = "%" + field_dict.pop("title") + "%"
+                clauses.append("title LIKE :title")
+                field_dict["title"] = "%" + field_dict["title"] + "%"
         if ( "description" in field_dict ):
             if ( match_type == "exact" ):
-                clauses.push("description = :description")
-                field_dict[":description"] = field_dict.pop("description")
+                clauses.append("description = :description")
             elif ( match_type == "contains" ):
-                clauses.push("description LIKE :description")
-                field_dict[":description"] = "%" + field_dict.pop("description") + "%"
+                clauses.append("description LIKE :description")
+                field_dict["description"] = "%" + field_dict["description"] + "%"
         if ( "work_created_ts" in field_dict ):
             # TODO - figure out how to safely query ranges
-            clauses.push("date(work_created_ts) = date(:work_created_ts")
-            field_dict[":work_created_ts"] = field_dict.pop("work_created_ts")
+            clauses.append("date(work_created_ts) = date(:work_created_ts")
         if ( "inserted_ts" in field_dict ):
             # TODO - figure out how to safely query ranges\
-            clauses.push("date(inserted_ts) = date(:inserted_ts")
-            field_dict[":inserted_ts"] = field_dict.pop("inserted_ts")
+            clauses.append("date(inserted_ts) = date(:inserted_ts")
         retrieve_sql = ("""\
             SELECT
-                works_id,
+                work_id,
                 title,
                 description,
                 datetime(work_created_ts) AS work_created,
                 datetime(inserted_ts) AS inserted
-            FROM """ + self._table_prefix + "works "
-            "WHERE " + join_type.join(clauses)
+            FROM """ + self._table_prefix + """works 
+            WHERE """ + join_type.join(clauses)
         )
         retrieve_cur = self._db_conn.cursor()
         retrieve_cur.execute(retrieve_sql, field_dict)
-        results = retrieve_cur.fetchall()
-        return results
+        results = retrieve_cur.fetchone()
+        return dict(results)
